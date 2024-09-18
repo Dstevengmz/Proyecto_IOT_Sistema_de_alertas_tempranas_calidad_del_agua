@@ -108,46 +108,92 @@ float mapFloat(float x, float in_min, float in_max, float out_min, float out_max
 }
 
 //EnviarDatosAlServidor
+// void enviarDatosAlServidor(String jsonString) {
+//   // Configurar el módulo para una conexión HTTP
+//   sim7600.println("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"");  // Seleccionar GPRS
+//   delay(1000);
+//   sim7600.println("AT+SAPBR=3,1,\"APN\",\"movistar.co\""); // APN de Movistar Colombia
+//   delay(1000);
+//   sim7600.println("AT+SAPBR=3,1,\"USER\",\"MOVISTAR\"");  // Usuario para el APN
+//   delay(1000);
+//   sim7600.println("AT+SAPBR=3,1,\"PWD\",\"MOVISTAR\"");   // Contraseña para el APN
+//   delay(1000);
+//   sim7600.println("AT+SAPBR=1,1");  // Activar el perfil de datos
+//   delay(3000);
+  
+//   // Iniciar la sesión HTTP
+//   sim7600.println("AT+HTTPINIT");
+//   delay(1000);
+
+//   // Configurar la URL del servidor (aquí tu API)
+//   sim7600.println("AT+HTTPPARA=\"URL\",\"http://192.168.0.10:3000/api/sensores\""); // Ajusta la IP o dominio
+//   delay(1000);
+
+//   // Indicar que la petición será POST
+//   sim7600.println("AT+HTTPPARA=\"CONTENT\",\"application/json\"");
+//   delay(1000);
+
+//   // Enviar los datos
+//   sim7600.print("AT+HTTPDATA=");
+//   sim7600.print(jsonString.length());
+//   sim7600.println(",10000");  // Especificar el tamaño de los datos
+//   delay(1000);
+//   sim7600.println(jsonString); // Enviar el JSON
+//   delay(1000);
+
+//   // Iniciar el POST
+//   sim7600.println("AT+HTTPACTION=1");
+//   delay(10000);  // Espera a que termine la petición
+
+//   // Cerrar la sesión HTTP
+//   sim7600.println("AT+HTTPTERM");
+//   delay(1000);
+// }
+
 void enviarDatosAlServidor(String jsonString) {
   // Configurar el módulo para una conexión HTTP
-  sim7600.println("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"");  // Seleccionar GPRS
-  delay(1000);
-  sim7600.println("AT+SAPBR=3,1,\"APN\",\"movistar.co\""); // APN de Movistar Colombia
-  delay(1000);
-  sim7600.println("AT+SAPBR=3,1,\"USER\",\"MOVISTAR\"");  // Usuario para el APN
-  delay(1000);
-  sim7600.println("AT+SAPBR=3,1,\"PWD\",\"MOVISTAR\"");   // Contraseña para el APN
-  delay(1000);
-  sim7600.println("AT+SAPBR=1,1");  // Activar el perfil de datos
-  delay(3000);
-  
-  // Iniciar la sesión HTTP
-  sim7600.println("AT+HTTPINIT");
-  delay(1000);
+  enviarComandoAT("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"", 1000);
+  enviarComandoAT("AT+SAPBR=3,1,\"APN\",\"movistar.co\"", 1000);
+  enviarComandoAT("AT+SAPBR=3,1,\"USER\",\"MOVISTAR\"", 1000);
+  enviarComandoAT("AT+SAPBR=3,1,\"PWD\",\"MOVISTAR\"", 1000);
+  enviarComandoAT("AT+SAPBR=1,1", 3000);
 
-  // Configurar la URL del servidor (aquí tu API)
-  sim7600.println("AT+HTTPPARA=\"URL\",\"http://192.168.0.10:3000/api/sensores\""); // Ajusta la IP o dominio
-  delay(1000);
+  // Iniciar la sesión HTTP
+  enviarComandoAT("AT+HTTPINIT", 1000);
+
+  // Configurar la URL del servidor (ajusta con la URL correcta o la generada por ngrok)
+  enviarComandoAT("AT+HTTPPARA=\"URL\",\"http://192.168.0.10:3000/api/sensores\"", 1000);
 
   // Indicar que la petición será POST
-  sim7600.println("AT+HTTPPARA=\"CONTENT\",\"application/json\"");
-  delay(1000);
+  enviarComandoAT("AT+HTTPPARA=\"CONTENT\",\"application/json\"", 1000);
 
-  // Enviar los datos
+  // Preparar para enviar los datos
   sim7600.print("AT+HTTPDATA=");
   sim7600.print(jsonString.length());
   sim7600.println(",10000");  // Especificar el tamaño de los datos
-  delay(1000);
+  delay(1000); // Esperar que el módulo acepte el comando
   sim7600.println(jsonString); // Enviar el JSON
-  delay(1000);
+  delay(5000); // Tiempo suficiente para que los datos sean transmitidos
 
   // Iniciar el POST
-  sim7600.println("AT+HTTPACTION=1");
-  delay(10000);  // Espera a que termine la petición
+  enviarComandoAT("AT+HTTPACTION=1", 10000);
+
+  // Leer el resultado del POST
+  delay(3000);
+  enviarComandoAT("AT+HTTPREAD", 1000);  // Leer la respuesta del servidor
 
   // Cerrar la sesión HTTP
-  sim7600.println("AT+HTTPTERM");
-  delay(1000);
+  enviarComandoAT("AT+HTTPTERM", 1000);
+}
+
+// Función auxiliar para enviar comandos AT y leer las respuestas
+void enviarComandoAT(String comando, int tiempoDeEspera) {
+  sim7600.println(comando);  // Enviar comando AT
+  delay(tiempoDeEspera);     // Esperar un poco
+  while (sim7600.available()) {
+    String respuesta = sim7600.readString();  // Leer respuesta del módulo
+    Serial.println("Respuesta: " + respuesta);  // Imprimir la respuesta en el monitor serial
+  }
 }
 
 
