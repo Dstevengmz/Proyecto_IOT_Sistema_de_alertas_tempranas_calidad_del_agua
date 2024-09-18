@@ -4,7 +4,7 @@
   "description": "Este es un proyecto para la gestion de alertas tempranas de la calidad del agua.",
   "main": "src/server.js",
   "scripts": {
-    "dev":"nodemon src/server.js"
+    "dev": "nodemon src/server.js"
   },
   "keywords": [
     "proyecto",

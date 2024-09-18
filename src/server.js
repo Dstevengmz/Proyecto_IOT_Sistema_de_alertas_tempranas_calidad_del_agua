@@ -1,10 +1,18 @@
 //Importacion de librerias
 const express = require('express');
-const fs = require('fs');
-const path = require('path'); 
+const bodyParser = require('body-parser');
+const fs = require('node:fs');
+const path = require('node:path'); 
+
+
 
 const app = express();
 const PORT = 3100;
+
+// Middleware para procesar JSON
+app.use(bodyParser.json());
+
+
 
 const leerDatos = () => {
     const dataPath = path.join(__dirname, 'db.json'); //  'db.json' está en la misma carpeta
@@ -32,10 +40,17 @@ app.get('/', (req, res) => {
     res.send("BIENVENIDO A LA API.ddd..");
 });
 
-app.get('/api',(req,res)=>{
+app.get('/app',(req,res)=>{
     const data=leerDatos();
     res.json(data.datos);
 });
+
+app.post('api/sensores',(req,res)=>{
+    const Datosdelossensores =req.body;
+    console.log('Datos recibidos del sensor es : ',Datosdelossensores)
+    res.status(200).send('Datos recibidos correctamente');
+});
+
 
 // Iniciar el servidor
 app.listen(PORT, () => {
@@ -45,8 +60,6 @@ app.listen(PORT, () => {
 
 
 //Darwin
-
-
 
 // const bodyParser = require('body-parser');
 // Middleware para parsear el cuerpo de las solicitudes

@@ -77,6 +77,9 @@ void loop() {
   Serial.println(jsonString);
   sim7600.println(jsonString);
 
+  //Llammamos la funcion
+  enviarDatosAlServidor(jsonString)
+
   // Esperar un breve periodo antes de la próxima lectura
   delay(1000);
 }
@@ -106,28 +109,46 @@ float mapFloat(float x, float in_min, float in_max, float out_min, float out_max
 
 //EnviarDatosAlServidor
 void enviarDatosAlServidor(String jsonString) {
-  sim7600.println("AT+HTTPPARA=\"URL\",\"http://localhost:3100/data\""); // Cambia `your_server_ip` por la IP de tu servidor
+  // Configurar el módulo para una conexión HTTP
+  sim7600.println("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"");  // Seleccionar GPRS
   delay(1000);
-  mostrarDatosSerial();
+  sim7600.println("AT+SAPBR=3,1,\"APN\",\"movistar.co\""); // APN de Movistar Colombia
+  delay(1000);
+  sim7600.println("AT+SAPBR=3,1,\"USER\",\"MOVISTAR\"");  // Usuario para el APN
+  delay(1000);
+  sim7600.println("AT+SAPBR=3,1,\"PWD\",\"MOVISTAR\"");   // Contraseña para el APN
+  delay(1000);
+  sim7600.println("AT+SAPBR=1,1");  // Activar el perfil de datos
+  delay(3000);
+  
+  // Iniciar la sesión HTTP
+  sim7600.println("AT+HTTPINIT");
+  delay(1000);
 
+  // Configurar la URL del servidor (aquí tu API)
+  sim7600.println("AT+HTTPPARA=\"URL\",\"http://192.168.0.10:3000/api/sensores\""); // Ajusta la IP o dominio
+  delay(1000);
+
+  // Indicar que la petición será POST
   sim7600.println("AT+HTTPPARA=\"CONTENT\",\"application/json\"");
   delay(1000);
-  mostrarDatosSerial();
 
+  // Enviar los datos
   sim7600.print("AT+HTTPDATA=");
-  sim7600.println(jsonString.length());
+  sim7600.print(jsonString.length());
+  sim7600.println(",10000");  // Especificar el tamaño de los datos
   delay(1000);
-  sim7600.println(jsonString);
+  sim7600.println(jsonString); // Enviar el JSON
   delay(1000);
-  mostrarDatosSerial();
 
-  sim7600.println("AT+HTTPACTION=1"); // POST
-  delay(5000); // Esperar la respuesta
-  mostrarDatosSerial();
+  // Iniciar el POST
+  sim7600.println("AT+HTTPACTION=1");
+  delay(10000);  // Espera a que termine la petición
 
-  sim7600.println("AT+HTTPREAD"); // Leer la respuesta del servidor
+  // Cerrar la sesión HTTP
+  sim7600.println("AT+HTTPTERM");
   delay(1000);
-  mostrarDatosSerial();
 }
+
 
 
