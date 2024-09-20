@@ -5,13 +5,11 @@ const fs = require('node:fs');
 const path = require('node:path'); 
 
 
-
 const app = express();
 const PORT = 3100;
 
 // Middleware para procesar JSON
 app.use(bodyParser.json());
-
 
 
 const leerDatos = () => {
@@ -50,7 +48,6 @@ app.post('api/sensores',(req,res)=>{
     console.log('Datos recibidos del sensor es : ',Datosdelossensores)
     res.status(200).send('Datos recibidos correctamente');
 });
-
 
 // Iniciar el servidor
 app.listen(PORT, () => {
