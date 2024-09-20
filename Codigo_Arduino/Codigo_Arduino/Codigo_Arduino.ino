@@ -126,7 +126,7 @@ void enviarDatosAlServidor(String jsonString) {
   delay(1000);
 
   // Configurar la URL del servidor (aquí tu API)
-  sim7600.println("AT+HTTPPARA=\"URL\",\"http://192.168.0.10:3000/api/sensores\""); // Ajusta la IP o dominio
+  sim7600.println("AT+HTTPPARA=\"URL\",\"https://8ac9-2800-484-aa80-5f00-3d10-f07a-9bf2-68a4.ngrok-free.app/api/sensores""); // Ajusta la IP o dominio
   delay(1000);
 
   // Indicar que la petición será POST
